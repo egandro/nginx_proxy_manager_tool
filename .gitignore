@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Ansible / Build artifacts
+*.tar.gz
+.ansible/
+
+# IDE
+.vscode/
+.idea/
+
+# LOCAL SECRETS (Do not remove this!)
+nginx-proxy.json
+*.ini
+*.key
+*.pem
+
+nginx-proxy.json
+audit.json

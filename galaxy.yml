@@ -1,0 +1,29 @@
+namespace: "egandro"
+name: "nginx_proxy_manager_tool"
+version: "1.0.0"
+readme: "README.md"
+authors:
+  - "Harald Fielker <harald.fielker@gmail.com>"
+description: "Manage Nginx Proxy Manager hosts and certificates via API."
+license:
+  - "MIT"
+tags:
+  - "nginx"
+  - "proxy"
+  - "http"
+  - "letsencrypt"
+repository: "https://github.com/egandro/nginx_proxy_manager_tool"
+documentation: "https://github.com/egandro/nginx_proxy_manager_tool"
+homepage: "https://github.com/egandro/nginx_proxy_manager_tool"
+issues: "https://github.com/egandro/nginx_proxy_manager_tool/issues"
+
+# This section is important for your hybrid repo:
+# You can list files here that should NOT be part of the Ansible Collection
+# when users install it (to keep the download small).
+build_ignore:
+  - "*.json"
+  - "*.ini"
+  - "venv"
+  - "__pycache__"
+  - "*.tar.gz"
+  - "npm_cli.py"

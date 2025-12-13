@@ -1,0 +1,10 @@
+---
+# Minimum version of Ansible required to use this collection
+requires_ansible: '>=2.14.0'
+
+# Plugin routing (used if you rename modules in future versions)
+plugin_routing:
+  modules:
+    npm_proxy:
+      redirect: null
+      deprecation: null
