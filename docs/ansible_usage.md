@@ -87,7 +87,6 @@ Here is a full example of how to configure a Proxy Host and a Redirect Host.
     npm_pass: "changeme"
 
   collections:
-    # Replace with the namespace defined in galaxy.yml
     - egandro.nginx_proxy_manager_tool
 
   tasks:
