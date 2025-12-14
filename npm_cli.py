@@ -236,6 +236,12 @@ def main():
         elif args.action == "providers":
             output_result(client.list_items(f"{ep}/dns-providers"), ["id", "name", "credentials"], args.json)
         elif args.action == "create-http":
+            # Idempotency Check
+            existing = client.get_cert(args.domains[0])
+            if existing:
+                print(f"Certificate for '{args.domains[0]}' already exists (ID: {existing['id']}).")
+                sys.exit(0) # Exit successfully
+
             client.create_cert({
                 "domain_names": args.domains,
                 "provider": "letsencrypt",
@@ -246,6 +252,12 @@ def main():
             })
             print("Requested.")
         elif args.action == "create-dns":
+            # Idempotency Check
+            existing = client.get_cert(args.domains[0])
+            if existing:
+                print(f"Certificate for '{args.domains[0]}' already exists (ID: {existing['id']}).")
+                sys.exit(0) # Exit successfully
+
             creds = args.credentials
             if os.path.exists(creds):
                 with open(creds, 'r') as f: creds = f.read().strip()
