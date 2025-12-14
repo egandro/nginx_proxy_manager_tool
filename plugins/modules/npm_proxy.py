@@ -24,6 +24,11 @@ def run_module():
             http2=dict(type='bool', default=False),
             hsts_enabled=dict(type='bool', default=False),
             hsts_subdomains=dict(type='bool', default=False),
+
+
+            certificate_id=dict(type='int', default=0),
+            access_list_id=dict(type='int', default=0),
+            advanced_config=dict(type='str'),
         ),
         supports_check_mode=True
     )
@@ -65,21 +70,25 @@ def run_module():
             "http2_support": module.params['http2'],
             "hsts_enabled": module.params['hsts_enabled'],
             "hsts_subdomains": module.params['hsts_subdomains'],
+            # Optional fields
+            "access_list_id": module.params['access_list_id'],
+            "certificate_id": module.params['certificate_id'],
+            "advanced_config":  module.params['advanced_config'],
             # Defaults for fields we don't manage yet via Ansible
-            "access_list_id": existing.get('access_list_id', 0) if existing else 0,
-            "certificate_id": existing.get('certificate_id', 0) if existing else 0,
             "meta": existing.get('meta', {}) if existing else {},
-            "advanced_config": existing.get('advanced_config', "") if existing else "",
             "locations": existing.get('locations', []) if existing else []
         }
 
         if not existing:
             # CREATE
             if not module.check_mode:
-                client.create_proxy(payload)
+                res = client.create_proxy(payload)
+                result['id'] = res['id']
             result['changed'] = True
             result['msg'] = f"Host {domain} created."
         else:
+            result['id'] = existing['id']
+
             # UPDATE - Deep Comparison for Idempotency
             # We compare the payload we BUILT against the existing object data
             diff_fields = []

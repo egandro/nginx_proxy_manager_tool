@@ -47,6 +47,9 @@ All modules accept the following connection and state parameters:
 *   `hsts_enabled`: (Boolean) Enable HSTS. Default: `false`.
 *   `block_exploits`: (Boolean) Block common exploits. Default: `false`.
 *   `caching`: (Boolean) Enable caching. Default: `false`.
+*   `certificate_id`: Existing Certificate Id. Default: `0`.
+*   `access_list_id`: Existing Access List Id. Default: `0`.
+*   `advanced_config`: Advanced Config. Default: ``.
 
 ### npm_redirect
 *   `domain`: (Required) The incoming domain name.

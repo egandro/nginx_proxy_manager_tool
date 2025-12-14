@@ -65,6 +65,7 @@ def main():
     p_create.add_argument("--http2", action="store_true")
     p_create.add_argument("--hsts", action="store_true")
     p_create.add_argument("--cert-id", type=int, default=0)
+    p_create.add_argument("--advanced-config", default='')
     p_create.add_argument("--access-list-id", type=int, default=0)
     for act in ["delete", "enable", "disable"]:
         x = p_sub.add_parser(act); x.add_argument("id", type=int)
@@ -170,7 +171,7 @@ def main():
                 "block_exploits": args.block_exploits, "allow_websocket_upgrade": args.websockets,
                 "http2_support": args.http2, "hsts_enabled": args.hsts, "hsts_subdomains": False,
                 "access_list_id": args.access_list_id, "certificate_id": args.cert_id,
-                "meta": {}, "advanced_config": "", "locations": []
+                "meta": {}, "advanced_config": args.advanced_config, "locations": []
             })
             print("Created.")
         elif args.action == "delete":
