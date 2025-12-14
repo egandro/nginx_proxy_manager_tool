@@ -88,7 +88,8 @@ def run_module():
                 payload['meta']['propagation_seconds'] = module.params['propagation']
 
             if not module.check_mode:
-                client.create_cert(payload)
+                res = client.create_cert(payload)
+                result['id'] = res['id']
 
             result['changed'] = True
             result['msg'] = f"Certificate for {domain} created."
