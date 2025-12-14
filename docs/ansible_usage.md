@@ -45,6 +45,7 @@ All modules accept the following connection and state parameters:
 *   `ssl_forced`: (Boolean) Force HTTPS. Default: `false`.
 *   `http2`: (Boolean) Enable HTTP/2 support. Default: `false`.
 *   `hsts_enabled`: (Boolean) Enable HSTS. Default: `false`.
+*   `hsts_subdomains`: (Boolean) Enable HSTS Subdomains. Default: `false`.
 *   `block_exploits`: (Boolean) Block common exploits. Default: `false`.
 *   `caching`: (Boolean) Enable caching. Default: `false`.
 *   `certificate_id`: Existing Certificate Id. Default: `0`.
