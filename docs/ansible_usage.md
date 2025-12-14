@@ -106,7 +106,7 @@ Here is a full example of how to configure a Proxy Host and a Redirect Host.
         forward_host: "10.10.10.50"
         forward_port: 8080
         ssl_forced: true
-        # websocket_support: true
+        # websockets: true
 
     - name: Ensure Redirect exists
       npm_redirect:
