@@ -2,7 +2,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.npm_api import NPMClient
+from ansible_collections.egandro.nginx_proxy_manager_tool.plugins.module_utils.npm_api import NPMClient
 import os
 
 def run_module():

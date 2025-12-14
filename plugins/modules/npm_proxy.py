@@ -5,7 +5,7 @@ __metaclass__ = type
 
 from ansible.module_utils.basic import AnsibleModule
 # Import the shared class from module_utils
-from ansible.module_utils.npm_api import NPMClient
+from ansible_collections.egandro.nginx_proxy_manager_tool.plugins.module_utils.npm_api import NPMClient
 
 DOCUMENTATION = r'''
 module: npm_proxy
