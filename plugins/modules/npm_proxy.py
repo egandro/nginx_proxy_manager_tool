@@ -28,7 +28,7 @@ def run_module():
 
             certificate_id=dict(type='int', default=0),
             access_list_id=dict(type='int', default=0),
-            advanced_config=dict(type='str'),
+            advanced_config=dict(type='str', default=''),
         ),
         supports_check_mode=True
     )
