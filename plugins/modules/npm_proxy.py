@@ -103,7 +103,11 @@ def run_module():
                 'block_exploits': payload['block_exploits'],
                 'caching_enabled': payload['caching_enabled'],
                 'http2_support': payload['http2_support'],
-                'hsts_enabled': payload['hsts_enabled']
+                'hsts_enabled': payload['hsts_enabled'],
+                'hsts_subdomains': payload['hsts_subdomains'],
+                'access_list_id': payload['access_list_id'],
+                'certificate_id': payload['certificate_id'],
+                'advanced_config': payload['advanced_config']
             }
 
             for field, desired in checks.items():
