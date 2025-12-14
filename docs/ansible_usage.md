@@ -99,6 +99,19 @@ Here is a full example of how to configure a Proxy Host and a Redirect Host.
     - egandro.nginx_proxy_manager_tool
 
   tasks:
+    - name: Ensure Certificate exists
+      npm_cert:
+        url: "{{ npm_url }}"
+        email: "{{ npm_user }}"
+        password: "{{ npm_pass }}"
+        state: present
+        domain: "*.internal.io" # can be wildcard with a provider
+        le_email: "admin@example.com"
+        provider: "cloudflare" # You can use duckdns with a free domain for testing
+        # You can pass the API token directly or read from a file lookup
+        dns_credentials: "dns_cloudflare_api_token = 123456789"
+      register: result
+
     - name: Ensure Proxy Host exists
       npm_proxy:
         url: "{{ npm_url }}"
@@ -106,10 +119,20 @@ Here is a full example of how to configure a Proxy Host and a Redirect Host.
         password: "{{ npm_pass }}"
         state: present
         domain: "app.internal.io"
+        # forward_scheme: https (http is default)
         forward_host: "10.10.10.50"
         forward_port: 8080
-        ssl_forced: true
+        # ssl_forced: true
+        # certificate_id: "{{ result.id }}"
         # websockets: true
+        # http2: true
+        # hsts_subdomains: true
+        # hsts_enabled: true
+        # block_exploits: true
+        # caching: true
+        # advanced_config: |
+        #   // foo
+        #   // bar
 
     - name: Ensure Redirect exists
       npm_redirect:
@@ -120,16 +143,4 @@ Here is a full example of how to configure a Proxy Host and a Redirect Host.
         domain: "old-site.com"
         forward_domain: "https://new-site.com"
         forward_http_code: 301
-
-    - name: Request Wildcard Certificate
-      npm_cert:
-        url: "{{ npm_url }}"
-        email: "{{ npm_user }}"
-        password: "{{ npm_pass }}"
-        state: present
-        domain: "*.internal.io"
-        le_email: "admin@example.com"
-        provider: "cloudflare"
-        # You can pass the API token directly or read from a file lookup
-        dns_credentials: "dns_cloudflare_api_token = 123456789"
 ```
