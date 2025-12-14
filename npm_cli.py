@@ -22,31 +22,67 @@ except ImportError:
 # --------------------------------
 
 def output_result(data, headers, json_mode=False):
+    """Handles visual output (JSON vs Table)"""
     if json_mode:
         print(json.dumps(data, indent=2, sort_keys=True))
-    elif not data:
+        return
+
+    if not data:
         print("No results found.")
-    else:
-        rows = [[item.get(h) for h in headers] for item in data]
-        print(tabulate(rows, headers=headers, tablefmt="grid"))
+        return
+
+    rows = []
+    for item in data:
+        row = [item.get(h) for h in headers]
+        rows.append(row)
+    print(tabulate(rows, headers=headers, tablefmt="grid"))
 
 def filter_data(data, query, search_keys):
-    if not query: return data
+    """Client-side filtering for search commands"""
+    if not query:
+        return data
+
     query = query.lower()
     filtered = []
     for item in data:
         match = False
         for key in search_keys:
             val = item.get(key)
+            # Handle lists (like domain_names)
             if isinstance(val, list):
-                if any(query in str(x).lower() for x in val): match = True
-            elif val and query in str(val).lower(): match = True
-        if match: filtered.append(item)
+                if any(query in str(x).lower() for x in val):
+                    match = True
+            # Handle strings/ints
+            elif val and query in str(val).lower():
+                match = True
+
+        if match:
+            filtered.append(item)
     return filtered
 
 def main():
-    parser = argparse.ArgumentParser(description="Nginx Proxy Manager CLI")
+    help_epilog = """
+CONFIGURATION:
+  1. Environment Variables:
+     export NPM_URL="http://npm.example.com"
+     export NPM_EMAIL="admin@example.com"
+     export NPM_PASSWORD="changeme"
+
+  2. Config File (nginx-proxy.json):
+     {
+       "url": "http://npm.example.com",
+       "email": "admin@example.com",
+       "password": "changeme"
+     }
+"""
+    parser = argparse.ArgumentParser(
+        description="Nginx Proxy Manager CLI",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=help_epilog
+    )
+
     parser.add_argument("--json", action="store_true", help="Output results as JSON")
+
     subparsers = parser.add_subparsers(dest="category", help="Category of resource")
 
     # --- AUDIT ---
@@ -65,11 +101,15 @@ def main():
     p_create.add_argument("--ip", required=True)
     p_create.add_argument("--port", type=int, required=True)
     p_create.add_argument("--scheme", choices=['http', 'https'], default='http')
+
+    # Feature Flags
     p_create.add_argument("--ssl-forced", action="store_true")
     p_create.add_argument("--caching", action="store_true")
     p_create.add_argument("--block-exploits", action="store_true")
     p_create.add_argument("--websockets", action="store_true")
     p_create.add_argument("--http2", action="store_true")
+    p_create.add_argument("--hsts", action="store_true", help="Enable HSTS")
+
     p_create.add_argument("--cert-id", type=int, default=0)
     p_create.add_argument("--access-list-id", type=int, default=0)
 
@@ -178,7 +218,7 @@ def main():
         sys.exit(0)
 
     # --- CLI HANDLERS ---
-    # NOTE: This uses the exact API logic, but formats it for CLI users.
+
     # PROXY
     if args.category == "proxy":
         ep = "nginx/proxy-hosts"
@@ -188,15 +228,26 @@ def main():
                 i['domains'] = "\n".join(i.get('domain_names',[]))
                 i['target'] = f"{i.get('forward_scheme')}://{i.get('forward_host')}:{i.get('forward_port')}"
                 i['ssl'] = "Yes" if i.get('ssl_forced') else "No"
-            output_result(d, ["id", "domains", "target", "enabled", "ssl"], args.json)
+                # Display new flags
+                i['opts'] = f"WS:{i.get('allow_websocket_upgrade')} H2:{i.get('http2_support')}"
+            output_result(d, ["id", "domains", "target", "opts", "enabled"], args.json)
         elif args.action == "create":
             client.create_proxy({
-                "domain_names": args.domains, "forward_scheme": args.scheme,
-                "forward_host": args.ip, "forward_port": args.port,
-                "ssl_forced": args.ssl_forced, "caching_enabled": args.caching,
-                "block_exploits": args.block_exploits, "allow_websocket_upgrade": args.websockets,
-                "http2_support": args.http2, "access_list_id": args.access_list_id,
-                "certificate_id": args.cert_id, "meta": {}, "advanced_config": "", "locations": []
+                "domain_names": args.domains,
+                "forward_scheme": args.scheme,
+                "forward_host": args.ip,
+                "forward_port": args.port,
+                # New Flag Mapping
+                "ssl_forced": args.ssl_forced,
+                "caching_enabled": args.caching,
+                "block_exploits": args.block_exploits,
+                "allow_websocket_upgrade": args.websockets,
+                "http2_support": args.http2,
+                "hsts_enabled": args.hsts,
+                "hsts_subdomains": False, # CLI default
+                "access_list_id": args.access_list_id,
+                "certificate_id": args.cert_id,
+                "meta": {}, "advanced_config": "", "locations": []
             })
             print("Created.")
         elif args.action == "delete":

@@ -38,9 +38,15 @@ All modules accept the following connection and state parameters:
 
 ### npm_proxy
 *   `domain`: (Required) The incoming domain name (e.g., `app.example.com`).
-*   `forward_host`: The target internal IP or hostname.
-*   `forward_port`: The target internal port.
-*   `ssl_forced`: (Boolean) If true, forces HTTPS redirection.
+*   `forward_host`: (Required) The target internal IP or hostname.
+*   `forward_port`: (Required) The target internal port.
+*   `forward_scheme`: The protocol to talk to the target. `http` or `https`. Default: `http`.
+*   `websockets`: (Boolean) Enable Websocket support. Default: `false`.
+*   `ssl_forced`: (Boolean) Force HTTPS. Default: `false`.
+*   `http2`: (Boolean) Enable HTTP/2 support. Default: `false`.
+*   `hsts_enabled`: (Boolean) Enable HSTS. Default: `false`.
+*   `block_exploits`: (Boolean) Block common exploits. Default: `false`.
+*   `caching`: (Boolean) Enable caching. Default: `false`.
 
 ### npm_redirect
 *   `domain`: (Required) The incoming domain name.
