@@ -52,7 +52,7 @@ def filter_data(data, query, search_keys):
 def main():
     parser = argparse.ArgumentParser(description="Nginx Proxy Manager CLI")
     parser.add_argument("--json", action="store_true", help="Output JSON")
-    parser.add_argument("--config", default="nginx-proxy.json", help="Path to config file (default: nginx-proxy.json)")
+    parser.add_argument("--config", help="Path to config file (default: cwd nginx-proxy.json or ~/.nginx-proxy.json)")
     subparsers = parser.add_subparsers(dest="category", help="Category")
 
     # AUDIT
@@ -275,9 +275,18 @@ def main():
     email = os.getenv("NPM_EMAIL")
     password = os.getenv("NPM_PASSWORD")
 
-    if not all([url, email, password]) and os.path.exists(args.config):
+    config_path = args.config
+    if not config_path:
+        if os.path.exists("nginx-proxy.json"):
+            config_path = "nginx-proxy.json"
+        else:
+            home_path = os.path.expanduser("~/.nginx-proxy.json")
+            if os.path.exists(home_path):
+                config_path = home_path
+
+    if not all([url, email, password]) and config_path and os.path.exists(config_path):
         try:
-            with open(args.config, "r") as f:
+            with open(config_path, "r") as f:
                 config = json.load(f)
                 if not url:
                     url = config.get("url")
