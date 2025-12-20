@@ -1,0 +1,41 @@
+[project]
+name = "nginx-proxy-manager-tool"
+version = "1.0.0"
+description = "Manage Nginx Proxy Manager hosts and certificates via API."
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    { name = "Harald Fielker", email = "harald.fielker@gmail.com" }
+]
+dependencies = [
+    "requests>=2.25.0",
+    "tabulate>=0.8.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff",
+    "mypy",
+    "pytest",
+    "types-requests",
+    "types-tabulate",
+    "ansible-core", # Required to lint/type-check the Ansible module
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["plugins"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.mypy]
+python_version = "3.9"
+ignore_missing_imports = true
