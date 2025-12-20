@@ -61,6 +61,12 @@ def generate_audit_json(client):
         cl['owner'] = user_map.get(s.get('owner_user_id'))
         clean_streams.append(cl)
 
+    clean_acls = []
+    for a in raw_acls:
+        cl = clean_obj(a.copy(), base_ignore)
+        cl['owner'] = user_map.get(a.get('owner_user_id'))
+        clean_acls.append(cl)
+
     clean_dead = []
     for d in raw_dead:
         cl = clean_obj(d.copy(), base_ignore)
@@ -81,6 +87,7 @@ def generate_audit_json(client):
     clean_proxies.sort(key=lambda x: x.get('domain_names', [''])[0])
     clean_redirects.sort(key=lambda x: x.get('domain_names', [''])[0])
     clean_streams.sort(key=lambda x: x.get('incoming_port', 0))
+    clean_acls.sort(key=lambda x: x.get('name', ''))
     clean_dead.sort(key=lambda x: x.get('domain_names', [''])[0])
     clean_settings.sort(key=lambda x: x.get('id', ''))
 
@@ -91,6 +98,7 @@ def generate_audit_json(client):
             "proxies": len(clean_proxies),
             "redirects": len(clean_redirects),
             "streams": len(clean_streams),
+            "access_lists": len(clean_acls),
             "dead_hosts": len(clean_dead),
             "settings": len(clean_settings)
         },
@@ -99,6 +107,7 @@ def generate_audit_json(client):
         "proxy_hosts": clean_proxies,
         "redirection_hosts": clean_redirects,
         "streams": clean_streams,
+        "access_lists": clean_acls,
         "dead_hosts": clean_dead,
         "settings": clean_settings
     }
