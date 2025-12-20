@@ -2,7 +2,7 @@
 
 This repository allows you to manage Nginx Proxy Manager resources using standard Ansible tasks.
 
-## ⚙️ Installation
+## Installation
 
 Since this collection is hosted on GitHub, install it using `ansible-galaxy` with the git URL:
 
@@ -10,7 +10,7 @@ Since this collection is hosted on GitHub, install it using `ansible-galaxy` wit
 ansible-galaxy collection install git+https://github.com/egandro/nginx_proxy_manager_tool.git
 ```
 
-## 🔧 Requirements
+## Requirements
 
 The target machine (where the modules execute, usually `localhost`) must have the Python dependencies installed:
 
@@ -18,7 +18,7 @@ The target machine (where the modules execute, usually `localhost`) must have th
 pip install requests
 ```
 
-## 📦 Available Modules
+## Available Modules
 
 *   `npm_proxy`: Manage Proxy Hosts
 *   `npm_redirect`: Manage Redirection Hosts
@@ -29,7 +29,7 @@ pip install requests
 *   `npm_acl`: Manage Access Lists
 *   `npm_setting`: Manage Global Settings
 
-## 📝 Module Parameters
+## Module Parameters
 
 ### Common Parameters
 All modules accept the following connection and state parameters:
