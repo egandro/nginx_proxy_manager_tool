@@ -50,7 +50,7 @@ Use a config file (default) `nginx-proxy.json`.
 ## Basic Usage
 
 ```bash
-./npm_cli.py [category] [action] [arguments]
+./npm-cli.py [category] [action] [arguments]
 ```
 
 **Global Options:**
@@ -67,16 +67,16 @@ Use a config file (default) `nginx-proxy.json`.
 **List and Search**
 ```bash
 # List all hosts
-./npm_cli.py proxy list
+./npm-cli.py proxy list
 
 # Search for a specific host (by domain or IP)
-./npm_cli.py proxy search "blog"
+./npm-cli.py proxy search "blog"
 ```
 
 **Create a Secure Proxy**
 Forward `secure.example.com` to an internal IP with forced SSL, HTTP/2, and Websockets enabled:
 ```bash
-./npm_cli.py proxy create \
+./npm-cli.py proxy create \
   --domains secure.example.com \
   --ip 192.168.1.50 \
   --port 8080 \
@@ -90,13 +90,13 @@ Forward `secure.example.com` to an internal IP with forced SSL, HTTP/2, and Webs
 **List DNS Providers**
 View supported providers and the required credential format:
 ```bash
-./npm_cli.py cert providers
+./npm-cli.py cert providers
 ```
 
 **Create a Wildcard Cert (DNS Challenge)**
 Using a credential file is recommended for security. Create `cloudflare.ini` with your API token inside.
 ```bash
-./npm_cli.py cert create-dns \
+./npm-cli.py cert create-dns \
   --domains "*.example.com" "example.com" \
   --email admin@example.com \
   --provider cloudflare \
@@ -112,10 +112,10 @@ The `audit` command exports your entire configuration (Hosts, Users, Certs) into
 
 ```bash
 # Export config from Server Old
-./npm_cli.py audit > backup_config.json
+./npm-cli.py audit > backup_config.json
 
 # Export config from Server New
-./npm_cli.py audit > new_config.json
+./npm-cli.py audit > new_config.json
 
 # Compare them
 diff backup_config.json new_config.json

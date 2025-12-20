@@ -26,4 +26,4 @@ build_ignore:
   - "venv"
   - "__pycache__"
   - "*.tar.gz"
-  - "npm_cli.py"
+  - "npm-cli.py"
