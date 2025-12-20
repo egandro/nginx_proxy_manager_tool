@@ -1,9 +1,4 @@
-import json
-import os
 import requests
-
-# Default Config for CLI usage
-CONFIG_FILE = 'nginx-proxy.json'
 
 class NPMClient:
     def __init__(self, url=None, email=None, password=None):
@@ -13,10 +8,6 @@ class NPMClient:
         self.password = password
         self.token = None
 
-        # If credentials weren't passed (CLI mode), try loading them
-        if not all([self.base_url, self.email, self.password]):
-            self._load_config()
-
         # Normalize URL
         if self.base_url:
             self.base_url = self.base_url.rstrip('/') + '/api'
@@ -24,26 +15,6 @@ class NPMClient:
         # Auto-login if we have creds
         if self.base_url and self.email and self.password:
             self.authenticate()
-
-    def _load_config(self):
-        """Load from Env Vars or JSON file (CLI Helper)"""
-        self.base_url = os.getenv('NPM_URL')
-        self.email = os.getenv('NPM_EMAIL')
-        self.password = os.getenv('NPM_PASSWORD')
-
-        if not all([self.base_url, self.email, self.password]):
-            if os.path.exists(CONFIG_FILE):
-                try:
-                    with open(CONFIG_FILE, 'r') as f:
-                        config = json.load(f)
-                        if not self.base_url:
-                            self.base_url = config.get('url')
-                        if not self.email:
-                            self.email = config.get('email')
-                        if not self.password:
-                            self.password = config.get('password')
-                except Exception:
-                    pass
 
     def authenticate(self):
         try:
