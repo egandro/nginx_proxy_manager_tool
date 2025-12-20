@@ -2,14 +2,27 @@
 
 ## Installation
 
+### Using UV
+
+```bash
+# if you don't have uv (package manager for python written in rust)
+# curl -LsSf https://astral.sh/uv/install.sh | sh
+uv tool install git+https://github.com/egandro/nginx_proxy_manager_tool.git
+npm-cli -h
+```
+
+### Via Git Checkout
+
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your_username/npm-automation.git
-    cd npm-automation
+    git clone https://github.com/egandro/nginx_proxy_manager_tool.git
+    cd nginx_proxy_manager_tool
     ```
 2.  **Install Dependencies:**
     ```bash
     pip install -r requirements.txt
+    # or uv
+    uv sync
     ```
     *(Requires `requests` and `tabulate`)*
 
