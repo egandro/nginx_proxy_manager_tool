@@ -8,8 +8,8 @@ This project provides an interface for the Nginx Proxy Manager API, allowing you
 
 This repository supports two modes:
 
-1.  **CLI Tool:** A standalone Python script for terminal management. 📖 CLI Docs
-2.  **Ansible Collection:** Modules to manage NPM infrastructure as code. 📖 Ansible Docs
+1.  **CLI Tool:** A standalone Python script for terminal management. [CLI Docs](docs/cli.md)
+2.  **Ansible Collection:** Modules to manage NPM infrastructure as code. [Ansible Docs](docs/ansible.md)
 
 This tool **does not** support full backup/restore via API because the API redacts sensitive secrets (keys, tokens).
 

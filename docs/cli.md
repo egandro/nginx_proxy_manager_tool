@@ -1,6 +1,6 @@
 # CLI Tool Usage
 
-## ⚙️ Installation
+## Installation
 
 1.  **Clone the repository:**
     ```bash
@@ -13,7 +13,7 @@
     ```
     *(Requires `requests` and `tabulate`)*
 
-## 🔧 Configuration
+## Configuration
 
 You can configure authentication using either Environment Variables (recommended for CI/CD) or a local JSON file.
 
@@ -34,7 +34,7 @@ Create a file named `nginx-proxy.json` in the script directory:
 }
 ```
 
-## 🚀 Basic Usage
+## Basic Usage
 
 ```bash
 ./npm_cli.py [category] [action] [arguments]
@@ -46,7 +46,7 @@ Create a file named `nginx-proxy.json` in the script directory:
 **Categories:**
 `proxy`, `redirect`, `404`, `stream`, `cert`, `user`, `audit`, `acl`, `setting`, `report`, `system`
 
-## 💡 Examples
+## Examples
 
 ### 1. Proxy Host Management
 
