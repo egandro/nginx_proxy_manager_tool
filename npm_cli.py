@@ -43,6 +43,7 @@ def filter_data(data, query, search_keys):
 def main():
     parser = argparse.ArgumentParser(description="Nginx Proxy Manager CLI")
     parser.add_argument("--json", action="store_true", help="Output JSON")
+    parser.add_argument("--config", default="nginx-proxy.json", help="Path to config file (default: nginx-proxy.json)")
     subparsers = parser.add_subparsers(dest="category", help="Category")
 
     # AUDIT
@@ -245,7 +246,22 @@ def main():
     args = parser.parse_args()
     if args.category is None: parser.print_help(); sys.exit(1)
 
-    client = NPMClient()
+    # Load configuration
+    url = os.getenv('NPM_URL')
+    email = os.getenv('NPM_EMAIL')
+    password = os.getenv('NPM_PASSWORD')
+
+    if not all([url, email, password]) and os.path.exists(args.config):
+        try:
+            with open(args.config, 'r') as f:
+                config = json.load(f)
+                if not url: url = config.get('url')
+                if not email: email = config.get('email')
+                if not password: password = config.get('password')
+        except Exception:
+            pass
+
+    client = NPMClient(url=url, email=email, password=password)
 
     if args.category == "audit":
         output_result(generate_audit_json(client), [], True)

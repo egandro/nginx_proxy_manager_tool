@@ -25,7 +25,7 @@ export NPM_PASSWORD="secure_password"
 ```
 
 **Option 2: Config File**
-Create a file named `nginx-proxy.json` in the script directory:
+Use a config file (default) `nginx-proxy.json`.
 ```json
 {
   "url": "http://npm.example.com",
@@ -42,6 +42,7 @@ Create a file named `nginx-proxy.json` in the script directory:
 
 **Global Options:**
 *   `--json`: Output the result as raw JSON instead of a formatted table.
+*   `--config`: Path to config file (default: `nginx-proxy.json`).
 
 **Categories:**
 `proxy`, `redirect`, `404`, `stream`, `cert`, `user`, `audit`, `acl`, `setting`, `report`, `system`
