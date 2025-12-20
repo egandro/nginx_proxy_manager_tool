@@ -12,17 +12,22 @@ def run_module():
             url=dict(type='str', required=True),
             email=dict(type='str', required=True),
             password=dict(type='str', required=True, no_log=True),
-            state=dict(type='str', choices=['present', 'absent'], default='present'),
+            state=dict(type='str', choices=['present', 'absent', 'renewed', 'downloaded'], default='present'),
 
             # Certificate Details
             domain=dict(type='str', required=True), # The primary CN
             extra_domains=dict(type='list', elements='str', default=[]),
-            le_email=dict(type='str', required=True), # Used for creation only
+            le_email=dict(type='str'), # Used for creation only
 
             # Provider Details
-            provider=dict(type='str', default='letsencrypt'), # 'letsencrypt' or 'cloudflare', etc.
+            provider=dict(type='str', default='letsencrypt'), # 'letsencrypt', 'custom', or 'cloudflare', etc.
             dns_credentials=dict(type='str', no_log=True), # Raw string or /path/to/file
-            propagation=dict(type='int', default=120)
+            propagation=dict(type='int', default=120),
+
+            # Custom / Download
+            cert_content=dict(type='str', no_log=True),
+            key_content=dict(type='str', no_log=True),
+            dest=dict(type='path')
         ),
         supports_check_mode=True
     )
@@ -48,6 +53,30 @@ def run_module():
         else:
             result['msg'] = "Certificate not found."
 
+    # --- RENEW LOGIC ---
+    elif module.params['state'] == 'renewed':
+        if existing:
+            if not module.check_mode:
+                client.renew_certificate(existing['id'])
+            result['changed'] = True
+            result['msg'] = f"Certificate for {domain} renewed."
+        else:
+            module.fail_json(msg=f"Certificate for {domain} not found, cannot renew.")
+
+    # --- DOWNLOAD LOGIC ---
+    elif module.params['state'] == 'downloaded':
+        if not module.params['dest']:
+            module.fail_json(msg="Parameter 'dest' is required for state='downloaded'")
+        if existing:
+            if not module.check_mode:
+                content = client.download_certificate(existing['id'])
+                with open(module.params['dest'], 'wb') as f:
+                    f.write(content)
+            result['changed'] = False # Downloading doesn't change server state
+            result['msg'] = f"Certificate downloaded to {module.params['dest']}"
+        else:
+            module.fail_json(msg=f"Certificate for {domain} not found.")
+
     # --- CREATE LOGIC (PRESENT) ---
     else:
         if existing:
@@ -62,34 +91,45 @@ def run_module():
             # 3. CREATE ONLY IF MISSING
             all_domains = [domain] + module.params['extra_domains']
 
-            # Payload matching the JSON structure you captured
-            payload = {
-                "domain_names": all_domains,
-                "provider": "letsencrypt",
-                "meta": {}
-            }
+            if module.params['provider'] == 'custom':
+                # Custom Certificate Upload
+                if not module.params['cert_content'] or not module.params['key_content']:
+                    module.fail_json(msg="cert_content and key_content are required for provider='custom'")
 
-            if module.params['provider'] == 'letsencrypt':
-                # HTTP Challenge
-                payload['meta']['dns_challenge'] = False
+                payload = {
+                    "name": domain,
+                    "certificate": module.params['cert_content'],
+                    "certificate_key": module.params['key_content']
+                }
+                if not module.check_mode:
+                    client.upload_certificate(payload)
             else:
-                # DNS Challenge
-                creds = module.params['dns_credentials']
-                # Handle File Path vs Raw String
-                if creds and os.path.exists(creds):
-                    try:
-                        with open(creds, 'r') as f: creds = f.read().strip()
-                    except Exception as e:
-                        module.fail_json(msg=f"Could not read credential file: {e}")
+                # Let's Encrypt (HTTP or DNS)
+                payload = {
+                    "domain_names": all_domains,
+                    "provider": "letsencrypt",
+                    "meta": {}
+                }
 
-                payload['meta']['dns_challenge'] = True
-                payload['meta']['dns_provider'] = module.params['provider']
-                payload['meta']['dns_provider_credentials'] = creds
-                payload['meta']['propagation_seconds'] = module.params['propagation']
+                if module.params['provider'] == 'letsencrypt':
+                    # HTTP Challenge
+                    payload['meta']['dns_challenge'] = False
+                else:
+                    # DNS Challenge
+                    creds = module.params['dns_credentials']
+                    if creds and os.path.exists(creds):
+                        try:
+                            with open(creds, 'r') as f: creds = f.read().strip()
+                        except Exception as e:
+                            module.fail_json(msg=f"Could not read credential file: {e}")
 
-            if not module.check_mode:
-                res = client.create_cert(payload)
-                result['id'] = res['id']
+                    payload['meta']['dns_challenge'] = True
+                    payload['meta']['dns_provider'] = module.params['provider']
+                    payload['meta']['dns_provider_credentials'] = creds
+                    payload['meta']['propagation_seconds'] = module.params['propagation']
+
+                if not module.check_mode:
+                    client.create_cert(payload)
 
             result['changed'] = True
             result['msg'] = f"Certificate for {domain} created."

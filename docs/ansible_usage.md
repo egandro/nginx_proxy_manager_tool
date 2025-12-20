@@ -1,6 +1,6 @@
 # Ansible Collection Usage
 
-This repository allows you to manage Nginx Proxy Manager resources using standard Ansible tasks. The modules use the API to ensure idempotency (they check if a resource exists before creating or updating it).
+This repository allows you to manage Nginx Proxy Manager resources using standard Ansible tasks.
 
 ## ⚙️ Installation
 
@@ -26,6 +26,8 @@ pip install requests
 *   `npm_stream`: Manage TCP/UDP Streams
 *   `npm_cert`: Manage Certificates (LetsEncrypt)
 *   `npm_user`: Manage Users
+*   `npm_acl`: Manage Access Lists
+*   `npm_setting`: Manage Global Settings
 
 ## 📝 Module Parameters
 
@@ -51,15 +53,25 @@ All modules accept the following connection and state parameters:
 *   `certificate_id`: Existing Certificate Id. Default: `0`.
 *   `access_list_id`: Existing Access List Id. Default: `0`.
 *   `advanced_config`: Advanced Config. Default: ``.
+*   `enabled`: (Boolean) Enable the host. Default: `true`.
 
 ### npm_redirect
 *   `domain`: (Required) The incoming domain name.
 *   `forward_domain`: The destination URL (e.g., `https://google.com`).
 *   `forward_http_code`: HTTP Status Code (300, 301, 302, 307, 308). Default: `301`.
+*   `forward_scheme`: The protocol (`http`, `https`, `auto`). Default: `auto`.
 *   `preserve_path`: (Boolean) If true, appends the path to the destination URL.
+*   `block_exploits`: (Boolean) Block common exploits. Default: `false`.
+*   `ssl_forced`: (Boolean) Force HTTPS. Default: `false`.
+*   `certificate_id`: Existing Certificate Id. Default: `0`.
+*   `advanced_config`: Advanced Config. Default: ``.
+*   `enabled`: (Boolean) Enable the host. Default: `true`.
 
 ### npm_dead_host
 *   `domain`: (Required) The domain that should return a 404 Not Found error.
+*   `certificate_id`: Existing Certificate Id. Default: `0`.
+*   `ssl_forced`: (Boolean) Force HTTPS. Default: `false`.
+*   `enabled`: (Boolean) Enable the host. Default: `true`.
 
 ### npm_stream
 *   `incoming_port`: (Required) The port Nginx will listen on.
@@ -67,6 +79,7 @@ All modules accept the following connection and state parameters:
 *   `forward_port`: The target internal port.
 *   `tcp`: (Boolean) Enable TCP forwarding. Default: `true`.
 *   `udp`: (Boolean) Enable UDP forwarding. Default: `false`.
+*   `enabled`: (Boolean) Enable the stream. Default: `true`.
 
 ### npm_cert
 *   `domain`: (Required) The primary domain name (CN).
@@ -79,8 +92,22 @@ All modules accept the following connection and state parameters:
 ### npm_user
 *   `target_email`: (Required) The email address of the user to manage.
 *   `target_name`: The display name of the user.
+*   `target_nickname`: The nickname of the user.
 *   `target_password`: The user's password. It will only update the password if this parameter is present.
 *   `is_admin`: (Boolean) Grant system administrator permissions. Default: `false`.
+*   `is_disabled`: (Boolean) Disable the user. Default: `false`.
+*   `permissions`: (Dict) Granular permissions object.
+
+### npm_acl
+*   `name`: (Required) Name of the Access List.
+*   `satisfy_any`: (Boolean) Satisfy any condition. Default: `false`.
+*   `users`: (List) List of users (dicts with `username` and `password`).
+
+### npm_setting
+*   `name`: (Required) The setting ID (e.g., `default-site`).
+*   `value`: (Required) The value to set. Valid options are: `congratulations`, `404`, `444`, `redirect`, `html`.
+*   `meta_redirect`: (String) Redirect URL. Required if value is `redirect`.
+*   `meta_html`: (String) HTML Content. Required if value is `html`.
 
 ## 💡 Playbook Example
 
@@ -144,4 +171,23 @@ Here is a full example of how to configure a Proxy Host and a Redirect Host.
         domain: "old-site.com"
         forward_domain: "https://new-site.com"
         forward_http_code: 301
+
+    - name: Create Access List
+      npm_acl:
+        url: "{{ npm_url }}"
+        email: "{{ npm_user }}"
+        password: "{{ npm_pass }}"
+        state: present
+        name: "Internal Team"
+        users:
+          - username: "dev"
+            password: "secure_password"
+
+    - name: Set Default Site
+      npm_setting:
+        url: "{{ npm_url }}"
+        email: "{{ npm_user }}"
+        password: "{{ npm_pass }}"
+        name: "default-site"
+        value: "congratulations"
 ```
