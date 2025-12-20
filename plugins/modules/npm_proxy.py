@@ -24,6 +24,7 @@ def run_module():
             http2=dict(type='bool', default=False),
             hsts_enabled=dict(type='bool', default=False),
             hsts_subdomains=dict(type='bool', default=False),
+            enabled=dict(type='bool', default=True),
 
 
             certificate_id=dict(type='int', default=0),
@@ -84,6 +85,10 @@ def run_module():
             if not module.check_mode:
                 res = client.create_proxy(payload)
                 result['id'] = res['id']
+
+                if not module.params['enabled']:
+                    client.disable_proxy_host(res['id'])
+
             result['changed'] = True
             result['msg'] = f"Host {domain} created."
         else:
@@ -116,9 +121,24 @@ def run_module():
                 if current_val != desired:
                     diff_fields.append(f"{field}: {current_val} -> {desired}")
 
+            # Check Enabled State
+            current_enabled = existing.get('enabled')
+            desired_enabled = module.params['enabled']
+            if int(current_enabled) != int(desired_enabled):
+                diff_fields.append(f"enabled: {current_enabled} -> {desired_enabled}")
+
             if diff_fields:
                 if not module.check_mode:
-                    client.update_proxy(existing['id'], payload)
+                    # Update configuration if needed
+                    config_changed = any(k in str(diff_fields) for k in checks.keys())
+                    if config_changed:
+                        client.update_proxy(existing['id'], payload)
+
+                    if int(current_enabled) != int(desired_enabled):
+                        if desired_enabled:
+                            client.enable_proxy_host(existing['id'])
+                        else:
+                            client.disable_proxy_host(existing['id'])
                 result['changed'] = True
                 result['msg'] = f"Updated: {', '.join(diff_fields)}"
 

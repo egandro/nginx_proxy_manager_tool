@@ -44,7 +44,7 @@ Create a file named `nginx-proxy.json` in the script directory:
 *   `--json`: Output the result as raw JSON instead of a formatted table.
 
 **Categories:**
-`proxy`, `redirect`, `404`, `stream`, `cert`, `user`, `audit`
+`proxy`, `redirect`, `404`, `stream`, `cert`, `user`, `audit`, `acl`, `setting`, `report`, `system`
 
 ## 💡 Examples
 
